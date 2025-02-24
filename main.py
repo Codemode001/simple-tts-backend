@@ -24,10 +24,15 @@ if not os.path.exists("output"):
 
 app.mount("/output", StaticFiles(directory="output"), name="output")
 
-tts = TTS(model_name="tts_models/en/ljspeech/tacotron2-DDC", progress_bar=False).to(
+tts = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=False).to(
     "cpu"
 )
 
+#ljspeech - default
+#tacotron2-DDC - basic model
+#vits - noce model
+#vctk - model_name="tts_models/en/vctk/vits"
+# male - p246 pass this to audio_data: speaker="p246"
 
 @app.get("/")
 def home():
@@ -41,7 +46,8 @@ async def synthesize(text: str):
         filepath = f"output/{audio_filename}"
         
         audio_data = tts.tts(text)
-        sf.write(filepath, np.array(audio_data), samplerate=22050)
+        # sf.write(filepath, np.array(audio_data), samplerate=22050)
+        sf.write(filepath, audio_data, samplerate=22050)
         
         return JSONResponse({
             "audio_file": f"output/{audio_filename}"
